@@ -1,4 +1,4 @@
 import mt
 
-Chinese = '你 你 你'
+Chinese = '我的名字叫李明'
 print(mt.mtChinese(Chinese))
