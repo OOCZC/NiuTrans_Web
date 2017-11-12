@@ -8,9 +8,9 @@
 </head>
 
 <body>
-<h1 class="text-center">NiuTrans 本地翻译1</h1>
+<h1 class="text-center">NiuTrans 本地翻译</h1>
 <div class="container"> <!--容器，用于包裹页面上的内容 -->
-<form action='trans' method='post'>
+<form>
     <div class="form">
         <h3>原文</h3>
         <textarea class="form-control" name="yuanwen" id="yuanwen" rows="4" placeholder="请输入中文..." autofocus="" style="font-size:25px"></textarea>
@@ -19,19 +19,22 @@
 	<h3>NiuTrans译文</h3>
         <textarea class="form-control" name="yiwen" id="yiwen" rows="4" style="font-size:25px"></textarea>
     <br>
-    <button  class="btn btn-success pull-right" style="font-size:20px" onclick="trans()">翻译</button>
+    <!--<button  class="btn btn-success pull-right" style="font-size:20px" onclick="trans()">翻译</button>  -->
 </form>
+    <button  class="btn btn-success pull-right" style="font-size:20px" onclick="trans()">翻译</button>
 </div>
 <script>
 	function trans(){
         var yiwen = document.getElementById("yiwen")
+        yiwen.value = ""
         $.ajax({
             url:"trans",
-            type:"post",
+            type:"POST",
             data:$('#yuanwen'),
             beforeSend: function(){},
             success: function(data){
-                $("#yiwen").html(data);
+                //$("#yiwen").val(data);
+                yiwen.value = data;
             },
             error: function(e){
                 alert('Error');
