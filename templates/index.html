@@ -21,9 +21,17 @@
     <br>
     <!--<button  class="btn btn-success pull-right" style="font-size:20px" onclick="trans()">翻译</button>  -->
 </form>
-    <button  class="btn btn-success pull-right" style="font-size:20px" onclick="trans()">翻译</button>
+    <button  class="btn btn-success pull-right" style="font-size:24px" onclick="trans()" data-loading-text="翻译中..." type="button">翻译</button>
 </div>
 <script>
+
+	$(function() {
+        $(".btn").click(function(){
+            $(this).button('loading').delay(1000).queue(function() {
+            });
+        });
+    });  
+
 	function trans(){
         var yiwen = document.getElementById("yiwen")
         yiwen.value = ""
@@ -35,6 +43,8 @@
             success: function(data){
                 //$("#yiwen").val(data);
                 yiwen.value = data;
+                $(".btn").button('reset')
+                //alert('reset')
             },
             error: function(e){
                 alert('Error');
