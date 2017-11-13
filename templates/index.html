@@ -8,19 +8,21 @@
 </head>
 
 <body>
-<h1 class="text-center">NiuTrans 本地翻译</h1>
 <div class="container"> <!--容器，用于包裹页面上的内容 -->
+<h1 class="text-center">NiuTrans 本地翻译</h1>
 <form>
     <div class="form">
         <h3>原文</h3>
-        <textarea class="form-control" name="yuanwen" id="yuanwen" rows="4" placeholder="请输入中文..." autofocus="" style="font-size:25px"></textarea>
+        <textarea class="form-control" name="yuanwen" id="yuanwen" rows="3" placeholder="请输入中文..." autofocus="" style="font-size:25px"></textarea>
     </div>
 
-	<h3>NiuTrans译文</h3>
-        <textarea class="form-control" name="yiwen" id="yiwen" rows="4" style="font-size:25px"></textarea>
-    <br>
-    <!--<button  class="btn btn-success pull-right" style="font-size:20px" onclick="trans()">翻译</button>  -->
+	<h3>NiuTrans本地译文</h3>
+        <textarea class="form-control" name="yiwen-local" id="yiwen-local" rows="3" style="font-size:25px"></textarea>
+
+	<h3>NiuTrans在线译文</h3>
+        <textarea class="form-control" name="yiwen-online" id="yiwen-online" rows="3" style="font-size:25px"></textarea>
 </form>
+<br>
     <button  class="btn btn-success pull-right" style="font-size:24px" onclick="trans()" data-loading-text="翻译中..." type="button">翻译</button>
 </div>
 <script>
@@ -32,17 +34,56 @@
         });
     });  
 
-	function trans(){
-        var yiwen = document.getElementById("yiwen")
-        yiwen.value = ""
+	
+
+function trans(){
+
+<!-- 下面在线NiuTrans翻译，From  fanyi.niutrans.com-->
+        $("#yiwen-online").val("翻译中...");
+        $("#yiwen-local").val("翻译中...");
+        var str = $("#yuanwen").val();
+        //$("#yiwen").val("正在翻译...");
+        var tar="";
+        var sou = new Array();
+        var from="zh";
+        var to="en";
+        var url_flag="0";
+	    //alert(str + "  0")
+
+         $.ajax({
+        type: "POST",
+        url: "http://183.129.153.70:8080/NiuTransServer/translation"+"?from="+from+"&to="+to.substr(0,2),
+        data:  "src_text="+ (encodeURIComponent(str))+"&url="+url_flag ,
+        dataType: "json",
+        success: function(msg1){
+                var dat = msg1;
+                //$("#result-st").text(from+"->"+to);
+                if(typeof(msg1.error_msg)=="undefined")
+                {
+                //$("#yiwen").html("");
+                //alert("2222")
+                //alert(msg1.tgt_text)
+                var result_tmp=msg1.tgt_text.replace(/\u0F0B /g,'\u0F0B');
+                //$("#yiwen").html(result_tmp.replace(/\n/g,"<br>"));
+                $("#yiwen-online").val(result_tmp);
+                
+                }
+                else
+                $("#yiwen-online").val(result_tmp);
+
+                //$(".btn").button('reset')
+        }
+        });
+
+<!-- 下面为本地翻译 -->
         $.ajax({
             url:"trans",
             type:"POST",
             data:$('#yuanwen'),
             beforeSend: function(){},
             success: function(data){
-                //$("#yiwen").val(data);
-                yiwen.value = data;
+                $("#yiwen-local").val(data);
+                //yiwen.value = data;
                 $(".btn").button('reset')
                 //alert('reset')
             },
@@ -50,7 +91,10 @@
                 alert('Error');
             }
         });
-    }	
+     }
+
+        	
+	
 </script>
 </body>
 </html>
