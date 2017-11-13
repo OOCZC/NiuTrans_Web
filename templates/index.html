@@ -72,7 +72,11 @@ function trans(){
                 $("#yiwen-online").val(result_tmp);
 
                 //$(".btn").button('reset')
-        }
+        },
+	error: function(e){
+		//alert("网络不好")
+                $("#yiwen-online").val("网络不好！请检查网络！");
+	}
         });
 
 <!-- 下面为本地翻译 -->
