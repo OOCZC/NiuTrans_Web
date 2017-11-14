@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='md5.js') }}"></script>
+<!-- md5.js is requirement for baidu translation -->
 </head>
 
 <body>
@@ -13,14 +15,15 @@
 <form>
     <div class="form">
         <h3>原文</h3>
-        <textarea class="form-control" name="yuanwen" id="yuanwen" rows="3" placeholder="请输入中文..." autofocus="" style="font-size:25px"></textarea>
+        <textarea class="form-control" name="yuanwen" id="yuanwen" rows="2" placeholder="请输入中文..." autofocus="" style="font-size:23px"></textarea>
     </div>
 
-	<h3>NiuTrans在线译文</h3>
-        <textarea class="form-control" name="yiwen-online" id="yiwen-online" rows="3" style="font-size:25px"></textarea>
-	<h3>NiuTrans本地译文</h3>
-
-        <textarea class="form-control" name="yiwen-local" id="yiwen-local" rows="3" style="font-size:25px"></textarea>
+	<h3>百度翻译</h3>
+        <textarea class="form-control" name="yiwen-baidu" id="yiwen-baidu" rows="2" style="font-size:23px"></textarea>
+	<h3>小牛翻译</h3>
+        <textarea class="form-control" name="yiwen-xiaoniu" id="yiwen-xiaoniu" rows="2" style="font-size:23px"></textarea>
+	<h3>NiuTrans 本地翻译</h3>
+        <textarea class="form-control" name="yiwen-local" id="yiwen-local" rows="2" style="font-size:23px"></textarea>
 
 </form>
 <br>
@@ -39,17 +42,49 @@
 
 function trans(){
 
-<!-- 下面在线NiuTrans翻译，From  fanyi.niutrans.com-->
-        $("#yiwen-online").val("翻译中...");
+        $("#yiwen-baidu").val("翻译中...");
+        $("#yiwen-xiaoniu").val("翻译中...");
         $("#yiwen-local").val("翻译中...");
+
+<!-- 下面为百度翻译 -->
+
+        var appid = '2015063000000001';
+        var key = '12345678';
+        var salt = (new Date).getTime();
+        var query = $("#yuanwen").val();
+        // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+        var from = 'zh';
+        var to = 'en';
+        var str1 = appid + query + salt +key;
+        var sign = MD5(str1);
+        $.ajax({
+            url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+            type: 'get',
+            dataType: 'jsonp',
+            data: {
+                q: query,
+                appid: appid,
+                salt: salt,
+                from: from,
+                to: to,
+                sign: sign
+            },
+            success: function (data) {
+                //console.log(data.trans_result[0].dst);
+                $("#yiwen-baidu").val(data.trans_result[0].dst);
+            } 
+        });
+
+
+<!-- 下面在线NiuTrans翻译，From  fanyi.niutrans.com-->
         var str = $("#yuanwen").val();
         //$("#yiwen").val("正在翻译...");
         var tar="";
         var sou = new Array();
-        var from="zh";
-        var to="en";
+        //var from="zh";
+        //var to="en";
         var url_flag="0";
-	    //alert(str + "  0")
+	//alert(str + "  0")
 
          $.ajax({
         type: "POST",
@@ -66,17 +101,17 @@ function trans(){
                 //alert(msg1.tgt_text)
                 var result_tmp=msg1.tgt_text.replace(/\u0F0B /g,'\u0F0B');
                 //$("#yiwen").html(result_tmp.replace(/\n/g,"<br>"));
-                $("#yiwen-online").val(result_tmp);
+                $("#yiwen-xiaoniu").val(result_tmp);
                 
                 }
                 else
-                $("#yiwen-online").val(result_tmp);
+                $("#yiwen-xiaoniu").val(result_tmp);
 
                 //$(".btn").button('reset')
         },
 	error: function(e){
 		//alert("网络不好")
-                $("#yiwen-online").val("网络不好！请检查网络！");
+                $("#yiwen-xiaoniu").val("网络不好！请检查网络！");
 	}
         });
 
@@ -88,17 +123,16 @@ function trans(){
             beforeSend: function(){},
             success: function(data){
                 $("#yiwen-local").val(data);
-                //yiwen.value = data;
                 $(".btn").button('reset')
+                //yiwen.value = data;
                 //alert('reset')
             },
             error: function(e){
                 alert('Error');
             }
         });
+        // $(".btn").button('reset')
      }
-
-        	
 	
 </script>
 </body>
