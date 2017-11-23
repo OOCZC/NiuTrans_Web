@@ -1,6 +1,6 @@
 def mtChinese(Chinese):
     import jieba
-    seg_list = jieba.cut(Chinese, cut_all=True)
+    seg_list = jieba.cut(Chinese, cut_all=False)
     with open("Chinese.txt", 'w') as f:
         for i in seg_list:
             f.write(i + " ")
